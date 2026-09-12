@@ -1,187 +1,191 @@
 const state = {
   day: 1,
   energy: 84,
-  water: 56,
-  trees: 18,
-  health: 78,
-  wildlife: 42,
-  score: 0
-};
-
-const logs = [
-  "The forest wakes up with a quiet hum.",
-  "A dry wind rolls over the valley.",
-  "Birdsong echoes across the canopy.",
-  "The riverbank glows in the morning light."
-];
-
-const actionNames = {
-  plant: "Plant a new tree",
-  water: "Water seedlings",
-  scout: "Scout the valley",
-  clean: "Clean the habitat"
-};
-
-const actionCooldown = {
-  plant: 3,
-  water: 2,
-  scout: 2,
-  clean: 2
-};
-
-const actionRules = {
-  plant: () => {
-    state.trees += 2;
-    state.energy = clamp(state.energy + 2);
-    state.water = clamp(state.water - 8);
-    state.health = clamp(state.health + 5);
-    state.wildlife = clamp(state.wildlife + 3);
-    state.score += 25;
-    addLog("You plant two young trees.");
-  },
-  water: () => {
-    state.water = clamp(state.water + 10);
-    state.health = clamp(state.health + 4);
-    state.wildlife = clamp(state.wildlife + 2);
-    state.score += 15;
-    addLog("You carry water to the green zone.");
-  },
-  scout: () => {
-    const wildlifeGain = randomInt(1, 5);
-    state.wildlife = clamp(state.wildlife + wildlifeGain);
-    state.energy = clamp(state.energy - 4);
-    state.health = clamp(state.health + 2);
-    state.score += 10 + wildlifeGain;
-    addLog("A scouting team reports more birds and tracks.");
-  },
-  clean: () => {
-    state.health = clamp(state.health + 8);
-    state.energy = clamp(state.energy + 2);
-    state.wildlife = clamp(state.wildlife + 4);
-    state.score += 20;
-    addLog("You remove litter and restore the trail.");
+  water: 62,
+  health: 80,
+  hunger: 32,
+  territory: 48,
+  pack: 7,
+  score: 0,
+  x: 50,
+  y: 54,
+  world: {
+    terrain: "Northern Ridge"
   }
 };
 
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const terrainNames = [
+  "Northern Ridge",
+  "River Bend",
+  "Heather Range",
+  "Foxglove Valley",
+  "Deep Pine Line"
+];
+
+const logMessages = [
+  "The wolf pack crosses the northern ridge.",
+  "Fresh tracks appear near the river.",
+  "A snow dusting covers the old spruce line.",
+  "The forest valley begins to stir at dawn."
+];
 
 function clamp(value) {
   return Math.max(0, Math.min(100, value));
 }
 
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function updateUI() {
-  document.getElementById("dayNumber").textContent = state.day;
+  document.getElementById("dayNumber").textContent = String(state.day).padStart(2, "0");
   document.getElementById("scoreNumber").textContent = state.score;
   document.getElementById("energyValue").textContent = `${state.energy}%`;
-  document.getElementById("waterValue").textContent = `${state.water}%`;
-  document.getElementById("treesValue").textContent = state.trees;
+  document.getElementById("hungerValue").textContent = `${state.hunger}%`;
   document.getElementById("healthValue").textContent = `${state.health}%`;
-  document.getElementById("wildlifeValue").textContent = `${state.wildlife}%`;
+  document.getElementById("waterValue").textContent = `${state.water}%`;
+  document.getElementById("territoryValue").textContent = `${state.territory}%`;
+  document.getElementById("packValue").textContent = state.pack;
 
-  const healthMeter = document.getElementById("healthMeter");
-  const energyMeter = document.getElementById("energyMeter");
-  const waterMeter = document.getElementById("waterMeter");
+  document.getElementById("energyMeter").style.width = `${state.energy}%`;
+  document.getElementById("waterMeter").style.width = `${state.water}%`;
+  document.getElementById("healthMeter").style.width = `${state.health}%`;
+  document.getElementById("territoryMeter").style.width = `${state.territory}%`;
 
-  energyMeter.style.width = `${state.energy}%`;
-  waterMeter.style.width = `${state.water}%`;
-  healthMeter.style.width = `${state.health}%`;
-
-  const forestMap = document.getElementById("forestMap");
-  const treeCount = clamp(state.trees, 8, 40);
-  forestMap.innerHTML = "";
-
-  for (let i = 0; i < treeCount; i++) {
-    const tree = document.createElement("span");
-    tree.className = "tree-icon";
-    tree.textContent = i % 4 === 0 ? "🌲" : "🌳";
-    forestMap.appendChild(tree);
-  }
+  const terrain = terrainNames[state.day % terrainNames.length];
+  document.getElementById("terrainName").textContent = terrain;
+  document.getElementById("wolfMarker").style.left = `${state.x}%`;
+  document.getElementById("wolfMarker").style.top = `${state.y}%`;
 }
 
 function addLog(text) {
   const log = document.getElementById("eventLog");
-  const li = document.createElement("li");
-  li.textContent = text;
-  log.insertBefore(li, log.firstChild);
+  const item = document.createElement("li");
+  item.textContent = text;
+  log.insertBefore(item, log.firstChild);
 
-  while (log.children.length > 6) {
+  while (log.children.length > 7) {
     log.removeChild(log.lastChild);
   }
 }
 
-function runAction(type) {
-  if (actionRules[type]) {
-    actionRules[type]();
+function moveWolf(direction) {
+  const step = 5;
 
-    if (state.energy < 10 || state.health < 8) {
-      addLog("The habitat is fragile. Careful planning is needed.");
-    }
-
-    if (state.health > 90 && state.wildlife > 75) {
-      state.score += 50;
-      addLog("The ecosystem enters a strong growth cycle.");
-    }
-
-    if (state.energy <= 0) {
-      state.energy = 50;
-      state.health = clamp(state.health - 5);
-      addLog("A tough rhythm drains your reserves.");
-    }
-
-    if (state.water <= 5) {
-      state.health = clamp(state.health - 8);
-      state.wildlife = clamp(state.wildlife - 4);
-      addLog("Water reserves are running low.");
-    }
-
-    state.day += 1;
-    state.energy = clamp(state.energy - randomInt(1, 4));
-    state.water = clamp(state.water - randomInt(1, 2));
-    state.health = clamp(state.health + randomInt(-2, 2));
-    state.wildlife = clamp(state.wildlife + randomInt(-2, 2));
-
-    if (state.day % 4 === 0) {
-      const weather = ["Rain", "Sun", "Wind", "Mist"];
-      const w = weather[randomInt(0, weather.length - 1)];
-      document.getElementById("weatherName").textContent = w;
-    }
-
-    updateUI();
+  if (direction === "up") {
+    state.y = clamp(state.y - step);
   }
-}
+  if (direction === "down") {
+    state.y = clamp(state.y + step);
+  }
+  if (direction === "left") {
+    state.x = clamp(state.x - step);
+  }
+  if (direction === "right") {
+    state.x = clamp(state.x + step);
+  }
 
-function bindEvents() {
-  document.getElementById("plantBtn").addEventListener("click", () => runAction("plant"));
-  document.getElementById("waterBtn").addEventListener("click", () => runAction("water"));
-  document.getElementById("scoutBtn").addEventListener("click", () => runAction("scout"));
-  document.getElementById("cleanBtn").addEventListener("click", () => runAction("clean"));
+  state.energy = clamp(state.energy - 3);
+  state.water = clamp(state.water - 2);
+  state.hunger = clamp(state.hunger + 2);
+  state.score += 3;
 
-  document.getElementById("nextDayBtn").addEventListener("click", () => {
-    state.day += 1;
-    state.energy = clamp(state.energy - 3);
-    state.water = clamp(state.water - 2);
-    state.health = clamp(state.health + randomInt(-1, 2));
-    state.wildlife = clamp(state.wildlife + randomInt(-2, 3));
-    addLog("A new day begins over the forest.");
-    updateUI();
-  });
-}
+  if (state.x < 12 || state.y < 12) {
+    addLog("The pack moves through the quiet tree line.");
+  } else if (state.y > 80) {
+    addLog("The wolves track the riverbank scent trail.");
+  } else {
+    addLog("The pack keeps a steady open-world pace.");
+  }
 
-function seedGame() {
-  const logList = document.getElementById("eventLog");
-  logs.forEach((text, i) => {
-    const li = document.createElement("li");
-    li.textContent = text;
-    if (i === 0) li.style.fontWeight = "700";
-    logList.appendChild(li);
-  });
+  if (state.water < 10) {
+    state.health = clamp(state.health - 8);
+    addLog("Water scarcity slows the hunting rhythm.");
+  }
 
   updateUI();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function hunt() {
+  const success = Math.random() > 0.18;
+
+  if (success) {
+    state.hunger = clamp(state.hunger - 18);
+    state.energy = clamp(state.energy + 7);
+    state.territory = clamp(state.territory + 5);
+    state.score += 35;
+    addLog("The pack makes a successful hunt near the valley.");
+  } else {
+    state.energy = clamp(state.energy - 5);
+    state.hunger = clamp(state.hunger + 5);
+    addLog("The hunt is difficult but the pack remains patient.");
+  }
+
+  updateUI();
+}
+
+function forage() {
+  state.energy = clamp(state.energy + 4);
+  state.water = clamp(state.water - 4);
+  state.health = clamp(state.health + 5);
+  state.score += 15;
+  addLog("The pack scouts berries and camas along the ridge.");
+  updateUI();
+}
+
+function rest() {
+  state.energy = clamp(state.energy + 10);
+  state.health = clamp(state.health + 6);
+  state.hunger = clamp(state.hunger + 3);
+  state.score += 8;
+  addLog("The pack rests safely inside the den boundary.");
+  updateUI();
+}
+
+function nextDay() {
+  state.day += 1;
+  state.energy = clamp(state.energy - 8);
+  state.water = clamp(state.water - 6);
+  state.health = clamp(state.health + randomInt(-2, 3));
+  state.hunger = clamp(state.hunger + 6);
+  state.territory = clamp(state.territory + randomInt(-2, 3));
+  state.score += 10;
+
+  addLog("The valley settles into another day of movement.");
+
+  if (state.day % 3 === 0) {
+    state.pack = clamp(state.pack + randomInt(-1, 2), 2, 15);
+  }
+
+  updateUI();
+}
+
+function bindEvents() {
+  document.getElementById("upBtn").addEventListener("click", () => moveWolf("up"));
+  document.getElementById("downBtn").addEventListener("click", () => moveWolf("down"));
+  document.getElementById("leftBtn").addEventListener("click", () => moveWolf("left"));
+  document.getElementById("rightBtn").addEventListener("click", () => moveWolf("right"));
+
+  document.getElementById("huntBtn").addEventListener("click", hunt);
+  document.getElementById("forageBtn").addEventListener("click", forage);
+  document.getElementById("restBtn").addEventListener("click", rest);
+  document.getElementById("nextDayBtn").addEventListener("click", nextDay);
+}
+
+function seedLogs() {
+  const log = document.getElementById("eventLog");
+
+  for (let i = 0; i < 4; i++) {
+    const item = document.createElement("li");
+    item.textContent = logMessages[i];
+    log.appendChild(item);
+  }
+}
+
+function initGame() {
   bindEvents();
-  seedGame();
-});
+  seedLogs();
+  updateUI();
+}
+
+document.addEventListener("DOMContentLoaded", initGame);
