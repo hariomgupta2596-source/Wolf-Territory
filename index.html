@@ -3,41 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wolf Territory</title>
+    <title>Wolf Territory - 3D Open World</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Three.js 3D Game Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <div class="app-wrap">
         <aside class="sidebar">
             <div class="brand">
-                <span class="brand-mark">♞</span>
+                <span class="brand-mark">🐺</span>
                 <span class="brand-name">Wolf Territory</span>
             </div>
 
             <div class="season-box">
-                <span class="label-small">Northern Range</span>
+                <span class="label-small">Northern Wilderness</span>
                 <div class="day-row">
                     <span class="day-text">Day <span id="dayNumber">01</span></span>
                 </div>
             </div>
 
             <div class="score-box">
-                <span class="label-small">Pack Score</span>
+                <span class="label-small">Pack Experience</span>
                 <span class="score-number" id="scoreNumber">0</span>
             </div>
 
-            <div class="nav-list">
-                <div class="nav-item active">
-                    <span class="nav-icon">✦</span>
-                    <span class="nav-text">Open World</span>
-                </div>
-                <div class="nav-item">
-                    <span class="nav-icon">⌕</span>
-                    <span class="nav-text">Tracking</span>
-                </div>
-                <div class="nav-item">
-                    <span class="nav-icon">☼</span>
-                    <span class="nav-text">Territory</span>
+            <div class="controls-guide">
+                <span class="label-small">Movement & Action Controls</span>
+                <div class="guide-list">
+                    <p>🕹️ <b>Virtual Joystick</b>: Drag knob in bottom-left</p>
+                    <p>⌨️ <b>WASD / Arrow Keys</b>: Move Wolf</p>
+                    <p>⚡ <b>Shift Key</b>: Sprint mode</p>
+                    <p>🐺 <b>Space Key</b>: Howl</p>
+                    <p>🥩 <b>E Key</b>: Stalk & Hunt Prey</p>
+                    <p>💧 <b>F Key</b>: Drink Water from River</p>
+                    <p>⛺ <b>R Key</b>: Rest at Den</p>
                 </div>
             </div>
         </aside>
@@ -45,23 +45,23 @@
         <main class="game-panel">
             <section class="topbar">
                 <div class="title-block">
-                    <span class="kicker">Wild Systems // 07</span>
-                    <h1>Wolf Ridge</h1>
+                    <span class="kicker">3D Real-World Simulation // 07</span>
+                    <h1>Wolf Ridge Open World</h1>
                 </div>
 
-                <div class="weather-box">
-                    <span class="weather-icon">☼</span>
-                    <span class="weather-text" id="terrainName">Northern Ridge</span>
+                <div class="weather-box" id="weatherBox">
+                    <span class="weather-icon" id="weatherIcon">☀️</span>
+                    <span class="weather-text" id="terrainName">Northern Ridge (Day)</span>
                 </div>
 
-                <button class="next-day" id="nextDayBtn">Next Day</button>
+                <button class="next-day" id="nextDayBtn">Advance Day</button>
             </section>
 
             <section class="dashboard">
                 <article class="metric-card">
                     <div class="metric-head">
                         <span class="metric-label">Energy</span>
-                        <span class="metric-value" id="energyValue">84%</span>
+                        <span class="metric-value" id="energyValue">100%</span>
                     </div>
                     <div class="meter">
                         <div class="meter-fill meter-energy" id="energyMeter"></div>
@@ -71,7 +71,7 @@
                 <article class="metric-card">
                     <div class="metric-head">
                         <span class="metric-label">Water</span>
-                        <span class="metric-value" id="waterValue">62%</span>
+                        <span class="metric-value" id="waterValue">80%</span>
                     </div>
                     <div class="meter">
                         <div class="meter-fill meter-water" id="waterMeter"></div>
@@ -81,7 +81,7 @@
                 <article class="metric-card">
                     <div class="metric-head">
                         <span class="metric-label">Health</span>
-                        <span class="metric-value" id="healthValue">80%</span>
+                        <span class="metric-value" id="healthValue">100%</span>
                     </div>
                     <div class="meter">
                         <div class="meter-fill meter-health" id="healthMeter"></div>
@@ -91,7 +91,7 @@
                 <article class="metric-card">
                     <div class="metric-head">
                         <span class="metric-label">Territory</span>
-                        <span class="metric-value" id="territoryValue">48%</span>
+                        <span class="metric-value" id="territoryValue">45%</span>
                     </div>
                     <div class="meter">
                         <div class="meter-fill meter-territory" id="territoryMeter"></div>
@@ -99,81 +99,67 @@
                 </article>
             </section>
 
-            <section class="content-grid">
-                <section class="map-panel">
-                    <div class="panel-title">
-                        <span>Open World</span>
-                        <span class="map-icons">
-                            <span class="icon-button">⌁</span>
-                            <span class="icon-button">◎</span>
-                        </span>
-                    </div>
+            <section class="viewport-section">
+                <div class="viewport-container" id="viewportContainer">
+                    <!-- 3D Three.js Render Viewport -->
+                    <div id="game3d"></div>
 
-                    <section class="open-map">
-                        <div class="map-sky">
-                            <span class="sun">☼</span>
-                            <span class="moon hidden">☽</span>
-                            <span class="ridge ridge-one"></span>
-                            <span class="ridge ridge-two"></span>
-                            <span class="ridge ridge-three"></span>
-                            <span class="forest forest-one"></span>
-                            <span class="forest forest-two"></span>
-                            <span class="forest forest-three"></span>
-                            <span class="river"></span>
-                            <span class="wolf-marker" id="wolfMarker">
-                                <span class="wolf-icon">🐺</span>
-                            </span>
-                        </div>
-                    </section>
-
-                    <section class="legend-row">
-                        <span class="legend-item"><span class="legend-swatch trees"></span>Trees <span class="legend-value" id="treesCount">136</span></span>
-                        <span class="legend-item"><span class="legend-swatch pack"></span>Pack <span class="legend-value" id="packValue">7</span></span>
-                        <span class="legend-item"><span class="legend-swatch hunger"></span>Hunger <span class="legend-value" id="hungerValue">32%</span></span>
-                    </section>
-                </section>
-
-                <section class="control-panel">
-                    <div class="panel-title">
-                        <span>Wolf Control</span>
-                    </div>
-
-                    <div class="joystick-wrap">
-                        <div class="joystick">
-                            <button class="control-button up" id="upBtn">▲</button>
-                            <div class="joystick-row">
-                                <button class="control-button" id="leftBtn">◀</button>
-                                <button class="control-button" id="rightBtn">▶</button>
-                            </div>
-                            <button class="control-button down" id="downBtn">▼</button>
+                    <!-- Minimap Radar Overlay -->
+                    <div class="minimap-card">
+                        <div class="minimap-title">SURVIVAL RADAR</div>
+                        <canvas id="minimap" width="130" height="130"></canvas>
+                        <div class="minimap-legend">
+                            <span class="legend-dot player"></span> Wolf
+                            <span class="legend-dot pack"></span> Pack
+                            <span class="legend-dot prey"></span> Prey
+                            <span class="legend-dot river"></span> River
                         </div>
                     </div>
 
-                    <div class="action-list">
-                        <button class="action-button" id="huntBtn">
-                            <span class="action-icon">✦</span>
-                            <span class="action-text">Hunt</span>
-                            <span class="action-arrow">></span>
+                    <!-- Floating Action Quickbar -->
+                    <div class="action-quickbar">
+                        <button class="quick-btn" id="howlBtn" title="Howl to Pack (Space)">
+                            <span class="btn-icon">🐺</span>
+                            <span class="btn-label">Howl</span>
                         </button>
-
-                        <button class="action-button" id="forageBtn">
-                            <span class="action-icon">✎</span>
-                            <span class="action-text">Forage</span>
-                            <span class="action-arrow">></span>
+                        <button class="quick-btn" id="huntBtn" title="Stalk & Hunt Prey (E)">
+                            <span class="btn-icon">🥩</span>
+                            <span class="btn-label">Hunt</span>
                         </button>
-
-                        <button class="action-button" id="restBtn">
-                            <span class="action-icon">☼</span>
-                            <span class="action-text">Rest</span>
-                            <span class="action-arrow">></span>
+                        <button class="quick-btn" id="drinkBtn" title="Drink Water (F)">
+                            <span class="btn-icon">💧</span>
+                            <span class="btn-label">Drink</span>
+                        </button>
+                        <button class="quick-btn" id="restBtn" title="Rest & Recover (R)">
+                            <span class="btn-icon">⛺</span>
+                            <span class="btn-label">Rest</span>
+                        </button>
+                        <button class="quick-btn" id="markBtn" title="Mark Territory (M)">
+                            <span class="btn-icon">🚩</span>
+                            <span class="btn-label">Mark</span>
                         </button>
                     </div>
-                </section>
+
+                    <!-- Virtual Analog Joystick -->
+                    <div class="joystick-wrapper" id="joystickWrapper">
+                        <div class="joystick-base" id="joystickBase">
+                            <div class="joystick-knob" id="joystickKnob"></div>
+                        </div>
+                        <div class="joystick-label">MOVE JOYSTICK</div>
+                    </div>
+
+                    <!-- Environment Info Overlay -->
+                    <div class="hud-status" id="hudStatus">
+                        <span>Speed: <strong id="speedHud">0.0</strong> km/h</span> | 
+                        <span>Pack: <strong id="packHud">7</strong> Wolves</span> | 
+                        <span>Prey Nearby: <strong id="preyHud">0</strong></span>
+                    </div>
+                </div>
             </section>
 
             <section class="log-panel">
                 <div class="panel-title">
-                    <span>Tracking Log</span>
+                    <span>Tracking & Event Log</span>
                 </div>
                 <ul class="event-log" id="eventLog"></ul>
             </section>
