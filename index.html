@@ -3,168 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wolf Territory - 3D Open World</title>
+    <title>Wolf Territory — Animated Wolf Adventure Game</title>
+    <meta name="description" content="Explore the northern wilderness as a wild wolf in a fully animated, scrollable 3D open-world game.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Three.js 3D Game Engine -->
+    <!-- Three.js 3D engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-    <div class="app-wrap">
-        <aside class="sidebar">
-            <div class="brand">
-                <span class="brand-mark">🐺</span>
-                <span class="brand-name">Wolf Territory</span>
+
+    <!-- ═══════════ PRELOADER ═══════════ -->
+    <div class="preloader" id="preloader">
+        <div class="preloader-inner">
+            <div class="paw-trail">
+                <span class="paw p1">🐾</span>
+                <span class="paw p2">🐾</span>
+                <span class="paw p3">🐾</span>
+                <span class="paw p4">🐾</span>
             </div>
-
-            <div class="season-box">
-                <span class="label-small">Northern Wilderness</span>
-                <div class="day-row">
-                    <span class="day-text">Day <span id="dayNumber">01</span></span>
-                </div>
-            </div>
-
-            <div class="score-box">
-                <span class="label-small">Pack Experience</span>
-                <span class="score-number" id="scoreNumber">0</span>
-            </div>
-
-            <div class="controls-guide">
-                <span class="label-small">Movement & Action Controls</span>
-                <div class="guide-list">
-                    <p>🕹️ <b>Virtual Joystick</b>: Drag knob in bottom-left</p>
-                    <p>⌨️ <b>WASD / Arrow Keys</b>: Move Wolf</p>
-                    <p>⚡ <b>Shift Key</b>: Sprint mode</p>
-                    <p>🐺 <b>Space Key</b>: Howl</p>
-                    <p>🥩 <b>E Key</b>: Stalk & Hunt Prey</p>
-                    <p>💧 <b>F Key</b>: Drink Water from River</p>
-                    <p>⛺ <b>R Key</b>: Rest at Den</p>
-                </div>
-            </div>
-        </aside>
-
-        <main class="game-panel">
-            <section class="topbar">
-                <div class="title-block">
-                    <span class="kicker">3D Real-World Simulation // 07</span>
-                    <h1>Wolf Ridge Open World</h1>
-                </div>
-
-                <div class="weather-box" id="weatherBox">
-                    <span class="weather-icon" id="weatherIcon">☀️</span>
-                    <span class="weather-text" id="terrainName">Northern Ridge (Day)</span>
-                </div>
-
-                <button class="next-day" id="nextDayBtn">Advance Day</button>
-            </section>
-
-            <section class="dashboard">
-                <article class="metric-card">
-                    <div class="metric-head">
-                        <span class="metric-label">Energy</span>
-                        <span class="metric-value" id="energyValue">100%</span>
-                    </div>
-                    <div class="meter">
-                        <div class="meter-fill meter-energy" id="energyMeter"></div>
-                    </div>
-                </article>
-
-                <article class="metric-card">
-                    <div class="metric-head">
-                        <span class="metric-label">Water</span>
-                        <span class="metric-value" id="waterValue">80%</span>
-                    </div>
-                    <div class="meter">
-                        <div class="meter-fill meter-water" id="waterMeter"></div>
-                    </div>
-                </article>
-
-                <article class="metric-card">
-                    <div class="metric-head">
-                        <span class="metric-label">Health</span>
-                        <span class="metric-value" id="healthValue">100%</span>
-                    </div>
-                    <div class="meter">
-                        <div class="meter-fill meter-health" id="healthMeter"></div>
-                    </div>
-                </article>
-
-                <article class="metric-card">
-                    <div class="metric-head">
-                        <span class="metric-label">Territory</span>
-                        <span class="metric-value" id="territoryValue">45%</span>
-                    </div>
-                    <div class="meter">
-                        <div class="meter-fill meter-territory" id="territoryMeter"></div>
-                    </div>
-                </article>
-            </section>
-
-            <section class="viewport-section">
-                <div class="viewport-container" id="viewportContainer">
-                    <!-- 3D Three.js Render Viewport -->
-                    <div id="game3d"></div>
-
-                    <!-- Minimap Radar Overlay -->
-                    <div class="minimap-card">
-                        <div class="minimap-title">SURVIVAL RADAR</div>
-                        <canvas id="minimap" width="130" height="130"></canvas>
-                        <div class="minimap-legend">
-                            <span class="legend-dot player"></span> Wolf
-                            <span class="legend-dot pack"></span> Pack
-                            <span class="legend-dot prey"></span> Prey
-                            <span class="legend-dot river"></span> River
-                        </div>
-                    </div>
-
-                    <!-- Floating Action Quickbar -->
-                    <div class="action-quickbar">
-                        <button class="quick-btn" id="howlBtn" title="Howl to Pack (Space)">
-                            <span class="btn-icon">🐺</span>
-                            <span class="btn-label">Howl</span>
-                        </button>
-                        <button class="quick-btn" id="huntBtn" title="Stalk & Hunt Prey (E)">
-                            <span class="btn-icon">🥩</span>
-                            <span class="btn-label">Hunt</span>
-                        </button>
-                        <button class="quick-btn" id="drinkBtn" title="Drink Water (F)">
-                            <span class="btn-icon">💧</span>
-                            <span class="btn-label">Drink</span>
-                        </button>
-                        <button class="quick-btn" id="restBtn" title="Rest & Recover (R)">
-                            <span class="btn-icon">⛺</span>
-                            <span class="btn-label">Rest</span>
-                        </button>
-                        <button class="quick-btn" id="markBtn" title="Mark Territory (M)">
-                            <span class="btn-icon">🚩</span>
-                            <span class="btn-label">Mark</span>
-                        </button>
-                    </div>
-
-                    <!-- Virtual Analog Joystick -->
-                    <div class="joystick-wrapper" id="joystickWrapper">
-                        <div class="joystick-base" id="joystickBase">
-                            <div class="joystick-knob" id="joystickKnob"></div>
-                        </div>
-                        <div class="joystick-label">MOVE JOYSTICK</div>
-                    </div>
-
-                    <!-- Environment Info Overlay -->
-                    <div class="hud-status" id="hudStatus">
-                        <span>Speed: <strong id="speedHud">0.0</strong> km/h</span> | 
-                        <span>Pack: <strong id="packHud">7</strong> Wolves</span> | 
-                        <span>Prey Nearby: <strong id="preyHud">0</strong></span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="log-panel">
-                <div class="panel-title">
-                    <span>Tracking & Event Log</span>
-                </div>
-                <ul class="event-log" id="eventLog"></ul>
-            </section>
-        </main>
+            <div class="pre-wolf">🐺</div>
+            <p class="pre-text">Entering the wild…</p>
+        </div>
     </div>
+
+    <!-- Scroll progress -->
+    <div class="scroll-progress"><span id="scrollProgressBar"></span></div>
+
+    <!-- ═══════════ NAVBAR ═══════════ -->
+    <nav class="navbar" id="navbar">
+        <a href="#home" class="nav-brand">
+            <span class="nav-mark">🐺</span>
+            <span class="nav-name">Wolf Territory</span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home" class="nav-link active">Home</a></li>
+            <li><a href="#explore" class="nav-link">Explore</a></li>
+            <li><a href="#gameplay" class="nav-link">Gameplay</a></li>
+            <li><a href="#play" class="nav-link">Play</a></li>
+            <li><a href="#log" class="nav-link">Log</a></li>
+        </ul>
+        <div class="nav-right">
+            <a href="#play" class="nav-cta">▶ Play Now</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+<!-- ═══════════ HERO ═══════════ -->
+    <header class="hero" id="home">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-vignette"></div>
+        <div class="aurora aurora-a"></div>
+        <div class="aurora aurora-b"></div>
+        <div class="hero-moon" id="heroMoon"></div>
+        <canvas class="hero-particles" id="heroParticles"></canvas>
+
+        <div class="hero-content" id="heroContent">
+            <span class="hero-kicker">🌲 3D Open-World Wolf Simulation</span>
+            <h1 class="hero-title">
+                <span class="title-line">WOLF</span>
+                <span class="title-line accent">TERRITORY</span>
+            </h1>
+            <p class="hero-sub">Roam misty valleys, hunt with your pack and howl beneath the aurora.
+                The northern wilderness is alive — scroll down and become the alpha.</p>
+            <div class="hero-actions">
+                <a href="#play" class="btn btn-primary">▶ Enter the Wild</a>
+                <a href="#explore" class="btn btn-ghost">Explore the Pack</a>
+            </div>
+            <div class="hero-badges">
+                <span>🕹️ Joystick + WASD</span>
+                <span>🌦️ Living Weather</span>
+                <span>🦌 Hunt · Drink · Rest</span>
+            </div>
+        </div>
+
+        <div class="wolf-runner" aria-hidden="true">
+            <span class="runner-body">🐺</span>
+        </div>
+
+        <a href="#stats" class="scroll-hint" aria-label="Scroll down">
+            <span class="mouse"><span class="wheel"></span></span>
+            <span class="hint-text">Scroll to explore</span>
+        </a>
+    </header>
+<!-- ═══════════ STATS STRIP ═══════════ -->
+    <section class="stats-strip" id="stats">
+        <div class="stat reveal">
+            <span class="stat-number" data-count="240">0</span><span class="stat-suffix">km²</span>
+            <span class="stat-label">Open Territory</span>
+        </div>
+        <div class="stat reveal">
+            <span class="stat-number" data-count="7">0</span><span class="stat-suffix">wolves</span>
+            <span class="stat-label">Living Pack</span>
+        </div>
+        <div class="stat reveal">
+            <span class="stat-number" data-count="14">0</span><span class="stat-suffix">prey</span>
+            <span class="stat-label">Wildlife Roaming</span>
+        </div>
+        <div class="stat reveal">
+            <span class="stat-number" data-count="4">0</span><span class="stat-suffix">states</span>
+            <span class="stat-label">Weather Cycles</span>
+        </div>
+    </section>
+
+    <!-- ═══════════ EXPLORE ═══════════ -->
+    <section class="section explore-section" id="explore">
+        <div class="section-head reveal">
+            <span class="kicker">Meet the Alpha</span>
+            <h2>Explore the <span class="accent">Wild Side</span></h2>
+            <p class="section-sub">Every ridge, river bend and pine grove is yours to patrol. Track prey with the
+                radar, rally your pack with a howl and claim the valley as your own.</p>
+            <div class="head-underline"></div>
+        </div>
+
+        <div class="explore-grid">
+            <div class="explore-media reveal-left">
+                <img src="wolf.jpg" alt="Grey wolf in the northern wilderness" class="explore-img">
+                <div class="media-frame"></div>
+                <div class="media-tag">📍 Northern Ridge</div>
+            </div>
+
+            <div class="explore-text reveal-right">
+                <h3>Built for the Hunt</h3>
+                <p>You are the alpha of a seven-strong pack. The world reacts to every step: deer and rabbits
+                    flee when you close in, the river glints in the shifting light, and weather transforms the
+                    valley from bright day to misty dusk to aurora night.</p>
+                <ul class="trait-list">
+                    <li>
+                        <span class="t-icon">👁️</span>
+                        <div><b>Keen Senses</b><p>The survival radar reveals prey, pack and river at a glance.</p></div>
+                    </li>
+                    <li>
+                        <span class="t-icon">🐺</span>
+                        <div><b>Pack Bonds</b><p>Howl to rally companions — they gather close and follow your lead.</p></div>
+                    </li>
+                    <li>
+                        <span class="t-icon">🏔️</span>
+                        <div><b>Built to Roam</b><p>Sprint across hills, riverbanks and snowy mountain borders.</p></div>
+                    </li>
+                    <li>
+                        <span class="t-icon">🌙</span>
+                        <div><b>Night Hunter</b><p>Track your prey beneath the aurora as the sky cycles on.</p></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="fact-grid stagger">
+            <article class="fact-card reveal">
+                <span class="fact-icon">🧭</span>
+                <h4>240 km² World</h4>
+                <p>Procedurally sculpted hills, forest, a winding river and snow-capped borders.</p>
+            </article>
+            <article class="fact-card reveal">
+                <span class="fact-icon">🦌</span>
+                <h4>14 Living Prey</h4>
+                <p>Deer and rabbits with flee-and-wander behaviour that reacts to your approach.</p>
+            </article>
+            <article class="fact-card reveal">
+                <span class="fact-icon">🌦️</span>
+                <h4>4 Weather States</h4>
+                <p>Bright day, misty valleys, amber sunsets and aurora skies — advance the day to shift.</p>
+            </article>
+            <article class="fact-card reveal">
+                <span class="fact-icon">🎮</span>
+                <h4>Touch + Keyboard</h4>
+                <p>Play with WASD and hotkeys on desktop, or the on-screen joystick on mobile.</p>
+            </article>
+        </div>
+    </section>
+<!-- ═══════════ GAMEPLAY ═══════════ -->
+    <section class="section gameplay-section" id="gameplay">
+        <div class="section-head reveal">
+            <span class="kicker">How You Play</span>
+            <h2>Survive, Hunt & <span class="accent">Lead</span></h2>
+            <p class="section-sub">Six pillars of wolf life in the valley — roam freely, read the land and keep the
+                pack fed, watered and rested.</p>
+            <div class="head-underline"></div>
+        </div>
+
+        <div class="feature-grid stagger">
+            <article class="feature-card reveal">
+                <span class="feature-icon">🌍</span>
+                <h3>Vast Open World</h3>
+                <p>Sculpted hills, deep pine forest, a winding river and snow-capped mountain borders to explore.</p>
+            </article>
+            <article class="feature-card reveal">
+                <span class="feature-icon">🥩</span>
+                <h3>Stalk &amp; Hunt</h3>
+                <p>Get within range of a deer or rabbit and strike — prey flees the moment it senses you.</p>
+            </article>
+            <article class="feature-card reveal">
+                <span class="feature-icon">🐺</span>
+                <h3>Howl to Rally</h3>
+                <p>Your howl echoes across the ridge and the pack sprints back to your side, ready to move.</p>
+            </article>
+            <article class="feature-card reveal">
+                <span class="feature-icon">💧</span>
+                <h3>Stay Hydrated</h3>
+                <p>Water drains as you roam — follow the radar to the river and drink before thirst bites.</p>
+            </article>
+            <article class="feature-card reveal">
+                <span class="feature-icon">⛺</span>
+                <h3>Rest &amp; Recover</h3>
+                <p>Drop low in the grass to recover energy and health, then continue the patrol refreshed.</p>
+            </article>
+            <article class="feature-card reveal">
+                <span class="feature-icon">🚩</span>
+                <h3>Mark Territory</h3>
+                <p>Plant your scent marker on the map and watch your dominance spread across the valley.</p>
+            </article>
+        </div>
+
+        <div class="controls-panel reveal">
+            <h3>Master the Controls</h3>
+            <div class="controls-grid">
+                <div class="ctrl">
+                    <div class="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></div>
+                    <span>Move Wolf</span>
+                </div>
+                <div class="ctrl">
+                    <div class="keys"><kbd>Shift</kbd></div>
+                    <span>Sprint</span>
+                </div>
+                <div class="ctrl">
+                    <div class="keys"><kbd>Space</kbd></div>
+                    <span>Howl</span>
+                </div>
+                <div class="ctrl">
+                    <div class="keys"><kbd>E</kbd></div>
+                    <span>Hunt Prey</span>
+                </div>
+                <div class="ctrl">
+                    <div class="keys"><kbd>F</kbd></div>
+                    <span>Drink Water</span>
+                </div>
+                <div class="ctrl">
+                    <div class="keys"><kbd>R</kbd></div>
+                    <span>Rest</span>
+                </div>
+                <div class="ctrl">
+                    <div class="keys"><kbd>M</kbd></div>
+                    <span>Mark Land</span>
+                </div>
+                <div class="ctrl">
+                    <div class="keys"><kbd>🕹️</kbd></div>
+                    <span>Touch Joystick</span>
+                </div>
+            </div>
+        </div>
+    </section>
+<!-- ═══════════ PLAY ═══════════ -->
+    <section class="section play-section" id="play">
+        <div class="section-head reveal">
+            <span class="kicker">Take Control</span>
+            <h2>Play the <span class="accent">Wild</span></h2>
+            <p class="section-sub">Use WASD or the joystick to move, Shift to sprint, and the hotkeys to hunt,
+                drink, rest and mark your land. The valley reacts to every move you make.</p>
+            <div class="head-underline"></div>
+        </div>
+
+        <div class="game-toolbar reveal">
+            <div class="day-score">
+                <span class="chip">📅 Day <b id="dayNumber">01</b></span>
+                <span class="chip">⭐ <b id="scoreNumber">0</b> XP</span>
+            </div>
+            <div class="weather-box">
+                <span class="weather-icon" id="weatherIcon">☀️</span>
+                <span id="terrainName">Northern Ridge (Day)</span>
+            </div>
+            <button class="next-day" id="nextDayBtn">Advance Day ➜</button>
+        </div>
+
+        <div class="hud-row reveal">
+            <article class="metric-card">
+                <div class="metric-head">
+                    <span class="metric-label">Energy</span>
+                    <span class="metric-value" id="energyValue">100%</span>
+                </div>
+                <div class="meter"><div class="meter-fill meter-energy" id="energyMeter"></div></div>
+            </article>
+            <article class="metric-card">
+                <div class="metric-head">
+                    <span class="metric-label">Water</span>
+                    <span class="metric-value" id="waterValue">85%</span>
+                </div>
+                <div class="meter"><div class="meter-fill meter-water" id="waterMeter"></div></div>
+            </article>
+            <article class="metric-card">
+                <div class="metric-head">
+                    <span class="metric-label">Health</span>
+                    <span class="metric-value" id="healthValue">100%</span>
+                </div>
+                <div class="meter"><div class="meter-fill meter-health" id="healthMeter"></div></div>
+            </article>
+            <article class="metric-card">
+                <div class="metric-head">
+                    <span class="metric-label">Territory</span>
+                    <span class="metric-value" id="territoryValue">45%</span>
+                </div>
+                <div class="meter"><div class="meter-fill meter-territory" id="territoryMeter"></div></div>
+            </article>
+        </div>
+
+        <div class="viewport-container reveal-scale" id="viewportContainer">
+            <!-- Three.js render target -->
+            <div id="game3d"></div>
+
+            <!-- Live HUD -->
+            <div class="hud-status" id="hudStatus">
+                <span>🏃 <strong id="speedHud">0.0</strong> km/h</span>
+                <span class="sep">|</span>
+                <span>🐺 <strong id="packHud">7</strong></span>
+                <span class="sep">|</span>
+                <span>🦌 <strong id="preyHud">0</strong> nearby</span>
+            </div>
+
+            <!-- Survival radar -->
+            <div class="minimap-card">
+                <div class="minimap-title">Survival Radar</div>
+                <canvas id="minimap" width="130" height="130"></canvas>
+                <div class="minimap-legend">
+                    <span><i class="legend-dot player"></i>Wolf</span>
+                    <span><i class="legend-dot pack"></i>Pack</span>
+                    <span><i class="legend-dot prey"></i>Prey</span>
+                    <span><i class="legend-dot river"></i>River</span>
+                </div>
+            </div>
+
+            <!-- Action quickbar -->
+            <div class="action-quickbar">
+                <button class="quick-btn" id="howlBtn" title="Howl to Pack (Space)">
+                    <span class="btn-icon">🐺</span><span class="btn-label">Howl</span>
+                </button>
+                <button class="quick-btn" id="huntBtn" title="Stalk &amp; Hunt Prey (E)">
+                    <span class="btn-icon">🥩</span><span class="btn-label">Hunt</span>
+                </button>
+                <button class="quick-btn" id="drinkBtn" title="Drink Water (F)">
+                    <span class="btn-icon">💧</span><span class="btn-label">Drink</span>
+                </button>
+                <button class="quick-btn" id="restBtn" title="Rest &amp; Recover (R)">
+                    <span class="btn-icon">⛺</span><span class="btn-label">Rest</span>
+                </button>
+                <button class="quick-btn" id="markBtn" title="Mark Territory (M)">
+                    <span class="btn-icon">🚩</span><span class="btn-label">Mark</span>
+                </button>
+            </div>
+
+            <!-- Virtual analog joystick -->
+            <div class="joystick-wrapper" id="joystickWrapper">
+                <div class="joystick-base" id="joystickBase">
+                    <div class="joystick-knob" id="joystickKnob"></div>
+                </div>
+                <div class="joystick-label">Move</div>
+            </div>
+        </div>
+    </section>
+<!-- ═══════════ LOG ══════════ -->
+    <section class="section log-section" id="log">
+        <div class="section-head reveal">
+            <span class="kicker">Field Notes</span>
+            <h2>Pack <span class="accent">Log</span></h2>
+            <p class="section-sub">Live reports from the valley as your pack patrols, hunts and claims new ground.</p>
+            <div class="head-underline"></div>
+        </div>
+
+        <div class="log-board reveal" id="logBoard">
+            <article class="log-item">
+                <span class="log-time">Day 01 · 06:20</span>
+                <p>🌲 The wolf pack gathers on the northern ridge. Territory patrol begins.</p>
+            </article>
+            <article class="log-item">
+                <span class="log-time">Day 01 · 11:05</span>
+                <p>🦌 Fresh elk tracks observed near the winding river.</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- ═══════════ CTA BANNER ═══════════ -->
+    <section class="cta-banner">
+        <div class="cta-glow"></div>
+        <h2>Ready to Lead the Pack?</h2>
+        <p>Scroll back to the arena, sprint across the ridge and howl beneath the aurora.</p>
+        <a href="#play" class="btn btn-primary">▶ Back to the Wild</a>
+    </section>
+
+    <!-- ═══════════ FOOTER ═══════════ -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <span class="nav-mark"></span>
+                <h3>Wolf Territory</h3>
+                <p>An animated, scrollable 3D wolf adventure built with vanilla JavaScript and Three.js — no
+                    build tools, no dependencies beyond the engine.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <a href="#home">Home</a>
+                <a href="#explore">The Pack</a>
+                <a href="#gameplay">Gameplay</a>
+                <a href="#play">Play</a>
+            </div>
+            <div class="footer-col">
+                <h4>Controls</h4>
+                <span>WASD — Move</span>
+                <span>Shift — Sprint</span>
+                <span>Space / E / F / R / M</span>
+            </div>
+            <div class="footer-col">
+                <h4>World</h4>
+                <span>240 km² territory</span>
+                <span>4 weather cycles</span>
+                <span>14 roaming prey</span>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© <span id="year">2026</span> Wolf Territory — wild adventures, endless ridges.</p>
+            <p>Built with 🐾 Three.js</p>
+        </div>
+    </footer>
+
+    <button class="to-top" id="toTop" aria-label="Back to top">↑</button>
 
     <script src="script.js"></script>
 </body>
